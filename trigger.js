@@ -6,7 +6,6 @@ module.exports = function triggers (options, cb) {
   const targetDevice = /computer/
   let computerCheck = false;
   const triggerCategoryPagesRegex = /https:\/\/local.withings.com\/..\/..\/(watches|scales|health-monitors)/
-  const productPages = /https:\/\/local\.withings\.com\/..\/..\/(withings-move|pulse-hr|steel-hr-sport|steel-hr|steel|body-plus|body-cardio|body|blood-pressure-monitor|thermo|sleep)/
   const triggerMainageRegex = /^https:\/\/local.withings.com\/..\/..\/$/
   let getPageUrl; 
   
@@ -25,16 +24,21 @@ module.exports = function triggers (options, cb) {
   let weightUnit = "kg"
   let numberOfSession;
   
+  //get the device the user is using to browse the webiste & get the current page url
   function getUserDeviceAndPageUrl(){
+
+    //check the user device
     options.getBrowserState().then(state => {
       if (targetDevice.test(state.ua.deviceType)) {
         computerCheck = true
       }
       
+      //get the current page
       getPageUrl = state.url;
     })
   }
 
+  //get the current session's number
   function getUserSession(){
     options.getVisitorState().then(function (state) {
       console.log("SESSION NUMBER", state.sessionNumber)
@@ -42,18 +46,150 @@ module.exports = function triggers (options, cb) {
     })
   }
 
+  //flag to be raised if the user visits a Product page
   function checkProductPageHit(){
+    //check if the cookie given on Product Page is here and true
     if(cm.val("productPageHit") === 'true')
       return true;
     else return false;
   }
+
+  //Drop the cookie containing the last product seen by th user
+  function dropDaCookie(lastSeenProduct){
+
+    //cookie containing the last seen product name
+    const cookieLastSeenProduct = `${options.meta.visitorId}`
+      
+    cm.set(cookieLastSeenProduct, `${lastSeenProduct}`, {
+      domain: options.meta.cookieDomain,
+      path: '/'
+    })
+      
+    console.log("dropping cookie", cookieLastSeenProduct);
+  }
+  
+  //associate the cookie with a full product set and send it to the variation
+  function checkCookie(cookie){
+      console.log("the cookieProduct being checked is", cookie[0])
+      
+      switch(true){
+        
+          case bpm.test(cm.val(cookie[0].name)): 
+            options.state.set('lastSeenProduct', "BPM");
+            options.state.set('picture', "https://image-cache.withings.com/site/media/wi_products/blood-pressure-monitor.jpg?fit&src=png&h=300")
+            options.state.set("descr", "Wireless Blood Pressure Monitor" )
+            options.state.set("link", "/blood-pressure-monitor")
+          return true;
+          
+          case sleep.test(cm.val(cookie[0].name)): 
+            options.state.set('lastSeenProduct', "Sleep")
+            options.state.set('picture', "https://image-cache.withings.com/site/media/wi_products/sleep-single.png?fit&src=png&h=300")
+            options.state.set("descr", "Sleep Tracking Mat" )
+            options.state.set("link", "/sleep")
+          return true;
+          
+          case thermo.test(cm.val(cookie[0].name)): 
+            options.state.set('lastSeenProduct', "Thermo")
+            options.state.set('picture', "https://image-cache.withings.com/site/media/wi_products/thermo-c.jpg?fit&src=png&h=300")
+            options.state.set("descr", "Smart Temporal Thermometer" )
+            options.state.set("link", "/thermo")
+          return true;
+          
+          case bodyplus.test(cm.val(cookie[0].name)): 
+            options.state.set('lastSeenProduct', "Body+")
+            options.state.set('picture', `https://image-cache.withings.com/site/media/wi_products/body-plus-black-${weightUnit}.jpg?fit&src=png&h=300`)
+            options.state.set("descr", "Body Composition Wi-Fi Scale" )
+            options.state.set("link", "/body-plus")
+          return true;
+          
+          case bodycardio.test(cm.val(cookie[0].name)): 
+            options.state.set('lastSeenProduct', "Body Cardio")
+            options.state.set('picture', `https://image-cache.withings.com/site/media/wi_products/body-cardio-black-nokia-${weightUnit}.jpg?fit&src=png&h=300`)
+            options.state.set("descr", "Heart Health & Body Composition Wi-Fi Smart Scale" )
+            options.state.set("link", "/body-cardio")
+          return true;
+          
+          case body.test(cm.val(cookie[0].name)): 
+            options.state.set('lastSeenProduct', "Body")
+            options.state.set('picture', `https://image-cache.withings.com/site/media/wi_products/body-black-${weightUnit}.jpg?fit&src=png&h=300`)
+            options.state.set("descr", "Weight & BMI Wi-Fi Scale" )
+            options.state.set("link", "/body")
+          return true;
+          
+          case steel.test(cm.val(cookie[0].name)): 
+            options.state.set('lastSeenProduct', "Steel")
+            options.state.set('picture', "https://image-cache.withings.com/site/media/wi_products/steel-white.jpg?fit&src=png&h=300")
+            options.state.set("descr", "Activity & Sleep Watch" )
+            options.state.set("link", "/steel")
+          return true;
+          
+          case steelhr.test(cm.val(cookie[0].name)): 
+            options.state.set('lastSeenProduct', "Steel HR")
+            options.state.set('picture', "https://image-cache.withings.com/site/media/wi_products/steel-hr-36b.png?fit&src=png&h=300&dpr=2")
+            options.state.set("descr", "Hybrid Smartwatch" )
+            options.state.set("link", "/steel-hr")
+          return true;
+          
+          case steelshrsport.test(cm.val(cookie[0].name)): 
+            options.state.set('lastSeenProduct', "Steel HR Sport")
+            options.state.set('picture', "https://image-cache.withings.com/site/media/wi_products/steel-hr-sport-40b.png?fit&src=png&h=300&dpr=2")
+            options.state.set("descr", "Multi-Sport Hybrid Smartwatch" )
+            options.state.set("link", "/steel-hr-sport")
+          return true;
+          
+          case pulsehr.test(cm.val(cookie[0].name)): 
+            options.state.set('lastSeenProduct', "Pulse HR")
+            options.state.set('picture', "https://image-cache.withings.com/site/media/wi_products/pulse-hr-black.jpg?fit&src=png&h=300")
+            options.state.set("descr", "Health & fitness tracker" )
+            options.state.set("link", "/pulse-hr")
+          return true;
+          
+          case move.test(cm.val(cookie[0].name)):
+            options.state.set('lastSeenProduct', "Move")
+            options.state.set('picture', "https://image-cache.withings.com/site/media/wi_products/withings-move-basic-white-sea-blue.jpg?fit&src=png&h=300")
+            options.state.set("descr", "Activity Tracking Watch" )
+            options.state.set("link", "/withings-move")
+          return true;
+          
+          default: return false;
+      }
+  }
+
+  //get the user language and display right weight units
+  options.uv.on('ecView', (data) => {
+    lang = data.language
+    if (targetLanguage.test(lang)) {
+      weightUnit = "lb"
+    }
+  }).replay()
+
+  //Put the last product seen in a cookie & stop the display of the card by giving a cookie flag to the user
+  options.uv.on('ecProduct', (data) => {
+       
+    lastSeenProduct = data.product.name;
+    console.log("LAST SEEN PRODUCT", lastSeenProduct);
+    
+    cm.set("productPageHit", `true`, {
+      domain: options.meta.cookieDomain,
+      path: '/'
+    })
+
+    dropDaCookie(lastSeenProduct);
+
+  }).replay()
+
+  //get the user device
+  getUserDeviceAndPageUrl();
+
+  //get user session number
+  getUserSession();
 
   //reset the value of the productPageHit cookie if it's a new session so
   //that until the user returns to a product page, the card is displayed
   //&
   //set the product to be displayed with the last seen product of the last session
   if(numberOfSession > cm.val("sessionWhenClicked")){
-    console.log("THIS IS A NEW SESSION AND PRODUCT PAGE HIT & HAS BEEN CLCIKCED SHOULD BE CLEARED")
+    console.log("THIS IS A NEW SESSION AND PRODUCTPAGEHIT & HASBEENCLICKED SHOULD BE CLEARED")
     cm.clear("productPageHit", {
       path: '/', // e.g. '/'
       domain: options.meta.cookieDomain // e.g. '.foo.com'
@@ -73,23 +209,10 @@ module.exports = function triggers (options, cb) {
       path: '/'
     })
   }
-
-  //get the user device
-  getUserDeviceAndPageUrl();
-
-  //get user session number
-  getUserSession();
   
-  //get the user language and display right weight units
-  options.uv.on('ecView', (data) => {
-    lang = data.language
-    if (targetLanguage.test(lang)) {
-      weightUnit = "lb"
-    }
-  }).replay()
-
   //check if a product page has been seen & dispatch the two cookies checked in the variation with true values
   if(checkProductPageHit() == true){
+    console.log("checking if a product page was hit")
     cm.set("hasBeenClicked", `true`, {
       domain: options.meta.cookieDomain,
       path: '/'
@@ -98,121 +221,6 @@ module.exports = function triggers (options, cb) {
       domain: options.meta.cookieDomain,
       path: '/'
     })
-  }
-
-  //Put the last product seen in a cookie & stop the display of the card
-  options.uv.on('ecProduct', (data) => {
-       
-    lastSeenProduct = data.product.name;
-    console.log("LASTTTTTTTTT", lastSeenProduct);
-    
-    cm.set("productPageHit", `true`, {
-      domain: options.meta.cookieDomain,
-      path: '/'
-    })
-
-    dropDaCookie(lastSeenProduct);
-
-  }).replay()
-  
-  //associate the cookie with a full product set and send it to the variation
-  checkCookie = (cookie)=>{
-    console.log("the cookieProduct being checked is", cookie[0])
-    
-    switch(true){
-      
-        case bpm.test(cm.val(cookie[0].name)): 
-          options.state.set('lastSeenProduct', "BPM");
-          options.state.set('picture', "https://image-cache.withings.com/site/media/wi_products/blood-pressure-monitor.jpg?fit&src=png&h=300")
-          options.state.set("descr", "Wireless Blood Pressure Monitor" )
-          options.state.set("link", "/blood-pressure-monitor")
-        return true;
-        
-        case sleep.test(cm.val(cookie[0].name)): 
-          options.state.set('lastSeenProduct', "Sleep")
-          options.state.set('picture', "https://image-cache.withings.com/site/media/wi_products/sleep-single.png?fit&src=png&h=300")
-          options.state.set("descr", "Sleep Tracking Mat" )
-          options.state.set("link", "/sleep")
-        return true;
-        
-        case thermo.test(cm.val(cookie[0].name)): 
-          options.state.set('lastSeenProduct', "Thermo")
-          options.state.set('picture', "https://image-cache.withings.com/site/media/wi_products/thermo-c.jpg?fit&src=png&h=300")
-          options.state.set("descr", "Smart Temporal Thermometer" )
-          options.state.set("link", "/thermo")
-        return true;
-        
-        case bodyplus.test(cm.val(cookie[0].name)): 
-          options.state.set('lastSeenProduct', "Body+")
-          options.state.set('picture', `https://image-cache.withings.com/site/media/wi_products/body-plus-black-${weightUnit}.jpg?fit&src=png&h=300`)
-          options.state.set("descr", "Body Composition Wi-Fi Scale" )
-          options.state.set("link", "/body-plus")
-        return true;
-        
-        case bodycardio.test(cm.val(cookie[0].name)): 
-          options.state.set('lastSeenProduct', "Body Cardio")
-          options.state.set('picture', `https://image-cache.withings.com/site/media/wi_products/body-cardio-black-nokia-${weightUnit}.jpg?fit&src=png&h=300`)
-          options.state.set("descr", "Heart Health & Body Composition Wi-Fi Smart Scale" )
-          options.state.set("link", "/body-cardio")
-        return true;
-        
-        case body.test(cm.val(cookie[0].name)): 
-          options.state.set('lastSeenProduct', "Body")
-          options.state.set('picture', `https://image-cache.withings.com/site/media/wi_products/body-black-${weightUnit}.jpg?fit&src=png&h=300`)
-          options.state.set("descr", "Weight & BMI Wi-Fi Scale" )
-          options.state.set("link", "/body")
-        return true;
-        
-        case steel.test(cm.val(cookie[0].name)): 
-          options.state.set('lastSeenProduct', "Steel")
-          options.state.set('picture', "https://image-cache.withings.com/site/media/wi_products/steel-white.jpg?fit&src=png&h=300")
-          options.state.set("descr", "Activity & Sleep Watch" )
-          options.state.set("link", "/steel")
-        return true;
-        
-        case steelhr.test(cm.val(cookie[0].name)): 
-          options.state.set('lastSeenProduct', "Steel HR")
-          options.state.set('picture', "https://image-cache.withings.com/site/media/wi_products/steel-hr-36b.png?fit&src=png&h=300&dpr=2")
-          options.state.set("descr", "Hybrid Smartwatch" )
-          options.state.set("link", "/steel-hr")
-        return true;
-        
-        case steelshrsport.test(cm.val(cookie[0].name)): 
-          options.state.set('lastSeenProduct', "Steel HR Sport")
-          options.state.set('picture', "https://image-cache.withings.com/site/media/wi_products/steel-hr-sport-40b.png?fit&src=png&h=300&dpr=2")
-          options.state.set("descr", "Multi-Sport Hybrid Smartwatch" )
-          options.state.set("link", "/steel-hr-sport")
-        return true;
-        
-        case pulsehr.test(cm.val(cookie[0].name)): 
-          options.state.set('lastSeenProduct', "Pulse HR")
-          options.state.set('picture', "https://image-cache.withings.com/site/media/wi_products/pulse-hr-black.jpg?fit&src=png&h=300")
-          options.state.set("descr", "Health & fitness tracker" )
-          options.state.set("link", "/pulse-hr")
-        return true;
-        
-        case move.test(cm.val(cookie[0].name)):
-          options.state.set('lastSeenProduct', "Move")
-          options.state.set('picture', "https://image-cache.withings.com/site/media/wi_products/withings-move-basic-white-sea-blue.jpg?fit&src=png&h=300")
-          options.state.set("descr", "Activity Tracking Watch" )
-          options.state.set("link", "/withings-move")
-        return true;
-        
-        default: return false;
-    }
-  }
-  
-  dropDaCookie = (lastSeenProduct)=>{
-
-    //cookie containing the last seen product name
-    const cookieLastSeenProduct = `${options.meta.visitorId}`
-    
-    cm.set(cookieLastSeenProduct, `${lastSeenProduct}`, {
-      domain: options.meta.cookieDomain,
-      path: '/'
-    })
-    
-    console.log("dropping cookie", cookieLastSeenProduct);
   }
 
   //check if user has already one session
