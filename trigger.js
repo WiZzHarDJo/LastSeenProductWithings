@@ -17,10 +17,10 @@ module.exports = function triggers (options, cb) {
   const bodyplus = /^Body\+/
   const bodycardio = /^Body Cardio/
   const pulsehr = /^Pulse HR/
-  const steel = /^Steel/
-  const steelhr = /^(Steel HR)/
-  const steelshrsport = /^Steel HR Sport/
-  const move =/^move$/
+  const steel = /^Steel White$/
+  const steelhr = /^Steel HR 36mm Black$/
+  const steelshrsport = /^Steel HR Sport 40mm White$/
+  const move =/^Withings Move Basic Essentials Black & Yellow Gold$/
   const targetLanguage = /^(en)$/i
   let weightUnit = "kg"
   let numberOfSession;
@@ -37,6 +37,7 @@ module.exports = function triggers (options, cb) {
 
   function getUserSession(){
     options.getVisitorState().then(function (state) {
+      console.log("SESSION NUMBER", state.sessionNumber)
       numberOfSession = state.sessionNumber;
     })
   }
@@ -49,11 +50,28 @@ module.exports = function triggers (options, cb) {
 
   //reset the value of the productPageHit cookie if it's a new session so
   //that until the user returns to a product page, the card is displayed
+  //&
+  //set the product to be displayed with the last seen product of the last session
   if(numberOfSession > cm.val("sessionWhenClicked")){
+    console.log("THIS IS A NEW SESSION AND PRODUCT PAGE HIT & HAS BEEN CLCIKCED SHOULD BE CLEARED")
     cm.clear("productPageHit", {
       path: '/', // e.g. '/'
       domain: options.meta.cookieDomain // e.g. '.foo.com'
     }) // true
+    cm.clear("hasBeenClicked", {
+      path: '/', // e.g. '/'
+      domain: options.meta.cookieDomain // e.g. '.foo.com'
+    }) // true
+    cm.clear("sessionWhenClicked", {
+      path: '/', // e.g. '/'
+      domain: options.meta.cookieDomain // e.g. '.foo.com'
+    }) // true
+
+    console.log("This is the value of the displayed product value:", `${cm.val(`${options.meta.visitorId}`)}`)
+    cm.set("displayedProductValue", `${cm.val(`${options.meta.visitorId}`)}`, {
+      domain: options.meta.cookieDomain,
+      path: '/'
+    })
   }
 
   //get the user device
@@ -206,7 +224,7 @@ module.exports = function triggers (options, cb) {
       if(triggerCategoryPagesRegex.test(getPageUrl) || triggerMainageRegex.test(getPageUrl)){
         console.log("second trigger ok")
         //trigger if the user possesses a cookie about a product
-        if(checkCookie(cm.get(`${options.meta.visitorId}`))){
+        if(checkCookie(cm.get("displayedProductValue"))){
           console.log("third trigger ok")
           cb()
         }
