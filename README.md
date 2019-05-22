@@ -1,3 +1,3 @@
-### A/B Test using Qubit : Last Seen Product 
+## A/B Test using Qubit : Last Seen Product 
 
-## Dependencies : cookieman & Jquery
+### Dependencies : cookieman & Jquery
