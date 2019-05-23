@@ -71,7 +71,7 @@ module.exports = function triggers (options, cb) {
         
           case bpm.test(cm.val(cookie[0].name)): 
             options.state.set('lastSeenProduct', "BPM");
-            options.state.set('picture', "https://image-cache.withings.com/site/media/wi_products/blood-pressure-monitor.jpg?fit&src=png&h=300")
+            options.state.set('picture', "https://image-cache.withings.com/site/media/wi_products/blood-pressure-monitor.png?fit&src=png&h=300")
             options.state.set("descr", cm.val(`${options.meta.visitorId}description`) )
             options.state.set("link", "/blood-pressure-monitor")
           return true;
@@ -85,35 +85,35 @@ module.exports = function triggers (options, cb) {
           
           case thermo.test(cm.val(cookie[0].name)): 
             options.state.set('lastSeenProduct', "Thermo")
-            options.state.set('picture', "https://image-cache.withings.com/site/media/wi_products/thermo-c.jpg?fit&src=png&h=300")
+            options.state.set('picture', "https://image-cache.withings.com/site/media/wi_products/thermo-c.png?fit&src=png&h=300")
             options.state.set("descr", cm.val(`${options.meta.visitorId}description`) )
             options.state.set("link", "/thermo")
           return true;
           
           case bodyplus.test(cm.val(cookie[0].name)): 
             options.state.set('lastSeenProduct', "Body+")
-            options.state.set('picture', `https://image-cache.withings.com/site/media/wi_products/body-plus-black-${weightUnit}.jpg?fit&src=png&h=300`)
+            options.state.set('picture', `https://image-cache.withings.com/site/media/wi_products/body-plus-black-${weightUnit}.png?fit&src=png&h=300`)
             options.state.set("descr", cm.val(`${options.meta.visitorId}description`) )
             options.state.set("link", "/body-plus")
           return true;
           
           case bodycardio.test(cm.val(cookie[0].name)): 
             options.state.set('lastSeenProduct', "Body Cardio")
-            options.state.set('picture', `https://image-cache.withings.com/site/media/wi_products/body-cardio-black-nokia-${weightUnit}.jpg?fit&src=png&h=300`)
+            options.state.set('picture', `https://image-cache.withings.com/site/media/wi_products/body-cardio-black-nokia-${weightUnit}.png?fit&src=png&h=300`)
             options.state.set("descr", cm.val(`${options.meta.visitorId}description`) )
             options.state.set("link", "/body-cardio")
           return true;
           
           case body.test(cm.val(cookie[0].name)): 
             options.state.set('lastSeenProduct', "Body")
-            options.state.set('picture', `https://image-cache.withings.com/site/media/wi_products/body-black-${weightUnit}.jpg?fit&src=png&h=300`)
+            options.state.set('picture', `https://image-cache.withings.com/site/media/wi_products/body-black-${weightUnit}.png?fit&src=png&h=300`)
             options.state.set("descr", cm.val(`${options.meta.visitorId}description`) )
             options.state.set("link", "/body")
           return true;
           
           case steel.test(cm.val(cookie[0].name)): 
             options.state.set('lastSeenProduct', "Steel")
-            options.state.set('picture', "https://image-cache.withings.com/site/media/wi_products/steel-white.jpg?fit&src=png&h=300")
+            options.state.set('picture', "https://image-cache.withings.com/site/media/wi_products/steel-white.png?fit&src=png&h=300")
             options.state.set("descr", cm.val(`${options.meta.visitorId}description`) )
             options.state.set("link", "/steel")
           return true;
@@ -134,14 +134,14 @@ module.exports = function triggers (options, cb) {
           
           case pulsehr.test(cm.val(cookie[0].name)): 
             options.state.set('lastSeenProduct', "Pulse HR")
-            options.state.set('picture', "https://image-cache.withings.com/site/media/wi_products/pulse-hr-black.jpg?fit&src=png&h=300")
+            options.state.set('picture', "https://image-cache.withings.com/site/media/wi_products/pulse-hr-black.png?fit&src=png&h=300")
             options.state.set("descr", cm.val(`${options.meta.visitorId}description`) )
             options.state.set("link", "/pulse-hr")
           return true;
           
           case move.test(cm.val(cookie[0].name)):
             options.state.set('lastSeenProduct', "Move")
-            options.state.set('picture', "https://image-cache.withings.com/site/media/wi_products/withings-move-basic-white-sea-blue.jpg?fit&src=png&h=300")
+            options.state.set('picture', "https://image-cache.withings.com/site/media/wi_products/withings-move-basic-white-sea-blue.png?fit&src=png&h=300")
             options.state.set("descr", cm.val(`${options.meta.visitorId}description`) )
             options.state.set("link", "/withings-move")
           return true;
