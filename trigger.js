@@ -46,26 +46,21 @@ module.exports = function triggers (options, cb) {
     })
   }
 
-  //flag to be raised if the user visits a Product page
-  function checkProductPageHit(){
-    //check if the cookie given on Product Page is here and true
-    if(cm.val("productPageHit") === 'true')
-      return true;
-    else return false;
-  }
-
-  //Drop the cookie containing the last product seen by th user
-  function dropDaCookie(lastSeenProduct){
-
-    //cookie containing the last seen product name
-    const cookieLastSeenProduct = `${options.meta.visitorId}`
-      
-    cm.set(cookieLastSeenProduct, `${lastSeenProduct}`, {
+  function dropCookie(name,value){
+    cm.set(name, value, {
       domain: options.meta.cookieDomain,
       path: '/'
     })
-      
-    console.log("dropping cookie", cookieLastSeenProduct);
+    console.log("dropping cookie", name, value);
+  }
+
+  function clearCookie(name){
+    cm.clear(name, {
+      path: '/', // e.g. '/'
+      domain: options.meta.cookieDomain // e.g. '.foo.com'
+    }) // true
+
+    console.log("clearing cookie", name);
   }
   
   //associate the cookie with a full product set and send it to the variation
@@ -165,16 +160,20 @@ module.exports = function triggers (options, cb) {
 
   //Put the last product seen in a cookie & stop the display of the card by giving a cookie flag to the user
   options.uv.on('ecProduct', (data) => {
+
+    getUserSession();
        
     lastSeenProduct = data.product.name;
     console.log("LAST SEEN PRODUCT", lastSeenProduct);
-    
-    cm.set("productPageHit", `true`, {
-      domain: options.meta.cookieDomain,
-      path: '/'
-    })
 
-    dropDaCookie(lastSeenProduct);
+    //cookie containing the last seen product name
+    const cookieLastSeenProduct = `${options.meta.visitorId}`;
+    dropCookie(cookieLastSeenProduct,`${lastSeenProduct}` )
+
+    dropCookie("hasBeenClicked", "true");
+    dropCookie("sessionWhenClicked", `${numberOfSession}`)
+    
+    options.emitCustomGoal('t103:haveSeenAProduct')
 
   }).replay()
 
@@ -184,45 +183,20 @@ module.exports = function triggers (options, cb) {
   //get user session number
   getUserSession();
 
-  //reset the value of the productPageHit cookie if it's a new session so
-  //that until the user returns to a product page, the card is displayed
+  //If this is a new session, clear cookies preventing the display
   //&
   //set the product to be displayed with the last seen product of the last session
   if(numberOfSession > cm.val("sessionWhenClicked")){
-    console.log("THIS IS A NEW SESSION AND PRODUCTPAGEHIT & HASBEENCLICKED SHOULD BE CLEARED")
-    cm.clear("productPageHit", {
-      path: '/', // e.g. '/'
-      domain: options.meta.cookieDomain // e.g. '.foo.com'
-    }) // true
-    cm.clear("hasBeenClicked", {
-      path: '/', // e.g. '/'
-      domain: options.meta.cookieDomain // e.g. '.foo.com'
-    }) // true
-    cm.clear("sessionWhenClicked", {
-      path: '/', // e.g. '/'
-      domain: options.meta.cookieDomain // e.g. '.foo.com'
-    }) // true
+    console.log("THIS IS A NEW SESSION AND HASBEENCLICKED SHOULD BE CLEARED")
+    clearCookie("hasBeenClicked")
+    clearCookie("sessionWhenClicked");
+    console.log("THIS IS A NEW SESSION AND HASBEENCLICKED HAS BEEN CLEARED")
+
 
     console.log("This is the value of the displayed product value:", `${cm.val(`${options.meta.visitorId}`)}`)
-    cm.set("displayedProductValue", `${cm.val(`${options.meta.visitorId}`)}`, {
-      domain: options.meta.cookieDomain,
-      path: '/'
-    })
+    dropCookie("displayedProductValue", `${cm.val(`${options.meta.visitorId}`)}`);
   }
   
-  //check if a product page has been seen & dispatch the two cookies checked in the variation with true values
-  if(checkProductPageHit() == true){
-    console.log("checking if a product page was hit")
-    cm.set("hasBeenClicked", `true`, {
-      domain: options.meta.cookieDomain,
-      path: '/'
-    })
-    cm.set("sessionWhenClicked", `${numberOfSession}`, {
-      domain: options.meta.cookieDomain,
-      path: '/'
-    })
-  }
-
   //check if user has already one session
   if(numberOfSession >= 2){
     //trigger if user is using a computer
@@ -239,5 +213,4 @@ module.exports = function triggers (options, cb) {
       }
     }
   }
-}
-  
+} 

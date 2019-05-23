@@ -65,6 +65,12 @@ module.exports = function variation (options) {
         domain: options.meta.cookieDomain,
         path: '/'
       })
+      
+      options.emitCustomGoal('t103:clickOnCross')
+    })
+    
+    link.click(()=>{
+      options.emitCustomGoal('t103:clickOnLink')
     })
   }
 }
