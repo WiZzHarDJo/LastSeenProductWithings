@@ -19,7 +19,7 @@ module.exports = function triggers (options, cb) {
   const steel = /^Steel White$/
   const steelhr = /^Steel HR 36mm Black$/
   const steelshrsport = /^Steel HR Sport 40mm White$/
-  const move =/^Withings Move Basic Essentials Black & Yellow Gold$/
+  const move =/^(withings-move|Withings Move Basic Essentials Black & Yellow Gold)$/
   const targetLanguage = /^(en)$/i
   let weightUnit = "kg"
   let numberOfSession;
@@ -149,12 +149,51 @@ module.exports = function triggers (options, cb) {
           default: return false;
       }
   }
+  
+  //get the user device
+  getUserDeviceAndPageUrl();
+
+  //get user session number
+  getUserSession();
 
   //get the user language and display right weight units
   options.uv.on('ecView', (data) => {
     lang = data.language
     if (targetLanguage.test(lang)) {
       weightUnit = "lb"
+    }
+    console.log("rentre dans le test fdp", /^https:\/\/local\.withings\.com\/..\/..\/withings-move$/.test(getPageUrl), getPageUrl)
+
+    if(/^https:\/\/local\.withings\.com\/..\/..\/withings-move$/.test(getPageUrl)){
+      let descriptionMove;
+
+      lastSeenProduct = data.subtypes[0];
+
+      getUserSession();
+
+      console.log("Is this the fucking move for fuck sake's", lastSeenProduct);
+
+      if(lang === 'fr'){
+        descriptionMove = "Montre tracker d'activité";
+      }
+      else if(lang === 'de'){
+        descriptionMove = "Fitnessuhr";
+      }
+      else {
+        descriptionMove = "Activity Tracking Watch";
+      }
+
+      console.log("this is the move description", descriptionMove);
+      
+      //cookie containing the last seen product name
+      const cookieLastSeenProduct = `${options.meta.visitorId}`;
+      dropCookie(cookieLastSeenProduct,`${lastSeenProduct}`);
+      dropCookie(`${options.meta.visitorId}description`,`${descriptionMove}`);
+  
+      dropCookie("hasBeenClicked", "true");
+      dropCookie("sessionWhenClicked", `${numberOfSession}`);
+      
+      options.emitCustomGoal('t103:haveSeenAProduct');
     }
   }).replay()
 
@@ -175,15 +214,10 @@ module.exports = function triggers (options, cb) {
     dropCookie("hasBeenClicked", "true");
     dropCookie("sessionWhenClicked", `${numberOfSession}`);
     
-    options.emitCustomGoal('t103:haveSeenAProduct')
+    options.emitCustomGoal('t103:haveSeenAProduct');
 
   }).replay()
 
-  //get the user device
-  getUserDeviceAndPageUrl();
-
-  //get user session number
-  getUserSession();
 
   //If this is a new session, clear cookies preventing the display
   //&
