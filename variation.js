@@ -40,6 +40,8 @@ module.exports = function variation (options) {
     lastSeenProductName = $("#lastSeenProduct_withings .card .product_name")
     lastSeenProductDescr = $("#lastSeenProduct_withings .card .product_desc")
     lastSeenProductImage = $("#lastSeenProduct_withings .card img")
+    lastSeenProductCardTitle = $("#lastSeenProduct_withings .card span:first")
+    lastSeenProductCardCTA = $("#lastSeenProduct_withings .card .btn-main")
     link = $("#lastSeenProduct_withings a")
     cross = $("#lastSeenProduct_withings .icon-croix")
   
@@ -49,6 +51,18 @@ module.exports = function variation (options) {
     lastSeenProductDescr.text(options.state.get('descr'))
     lastSeenProductImage.attr("src",options.state.get('picture'));
     link.attr("href",options.state.get('link'))
+    
+    if(options.state.get("language")=="en"){
+      lastSeenProductCardCTA.text("Take me there")
+    }
+    if(options.state.get("language")=="fr"){
+      lastSeenProductCardCTA.text("J'y retourne")
+      lastSeenProductCardTitle.text("Dernier produit consulté")
+    }
+    if(options.state.get("language")=="de"){
+      lastSeenProductCardCTA.text("Zurück")
+      lastSeenProductCardTitle.text("Zuletzt angesehenes Produkt")
+    }
   
     //if cross clicked, hide card, set the fact that the cross has been clicked in a cookie, record the session when the cross has been clicked
     cross.click(()=>{

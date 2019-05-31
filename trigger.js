@@ -5,8 +5,8 @@ module.exports = function triggers (options, cb) {
   let lastSeenProduct;
   const targetDevice = /computer/
   let computerCheck = false;
-  const triggerCategoryPagesRegex = /https:\/\/local.withings.com\/..\/..\/(watches|scales|health-monitors)/
-  const triggerMainageRegex = /^https:\/\/local.withings.com\/..\/..\/$/
+  const triggerCategoryPagesRegex = /https:\/\/www.withings.com\/..\/..\/(watches|scales|health-monitors)/
+  const triggerMainageRegex = /^https:\/\/www.withings.com\/..\/..\/$/
   let getPageUrl; 
   
   const body = /^Body/
@@ -20,6 +20,8 @@ module.exports = function triggers (options, cb) {
   const steelhr = /^Steel HR 36mm Black$/
   const steelshrsport = /^Steel HR Sport 40mm White$/
   const move =/^(withings-move|Withings Move Basic Essentials Black & Yellow Gold)$/
+  const sapphire = /^Steel HR 36mm Sapphire Signature White & Rose Gold$/
+  const limmited = /^Steel HR 36mm Blue & Rose Gold$/
   const targetLanguage = /^(en)$/i
   let weightUnit = "kg"
   let numberOfSession;
@@ -146,6 +148,20 @@ module.exports = function triggers (options, cb) {
             options.state.set("link", "/withings-move")
           return true;
           
+          case sapphire.test(cm.val(cookie[0].name)):
+            options.state.set('lastSeenProduct', "Steel HR Sapphire")
+            options.state.set('picture', "https://image-cache.withings.com/site/media/wi_products/steel-hr-sapphire-36rgw.png?fit&src=png&h=300")
+            options.state.set("descr", cm.val(`${options.meta.visitorId}description`) )
+            options.state.set("link", "/steel-hr-sapphire-signature")
+          return true;
+          
+          case limited.test(cm.val(cookie[0].name)):
+            options.state.set('lastSeenProduct', "Steel HR Limited Edition")
+            options.state.set('picture', "https://image-cache.withings.com/site/media/wi_products/steel-hr-36rgblue.png?fit&src=png&h=300")
+            options.state.set("descr", cm.val(`${options.meta.visitorId}description`) )
+            options.state.set("link", "/steel-hr-limited-edition")
+          return true;
+          
           default: return false;
       }
   }
@@ -159,12 +175,13 @@ module.exports = function triggers (options, cb) {
   //get the user language and display right weight units
   options.uv.on('ecView', (data) => {
     lang = data.language
+    options.state.set("language", lang)
     if (targetLanguage.test(lang)) {
       weightUnit = "lb"
     }
-    console.log("rentre dans le test fdp", /^https:\/\/local\.withings\.com\/..\/..\/withings-move$/.test(getPageUrl), getPageUrl)
+    console.log("rentre dans le test fdp", /^https:\/\/www\.withings\.com\/..\/..\/(withings-move|withings-move\/store)$/.test(getPageUrl), getPageUrl)
 
-    if(/^https:\/\/local\.withings\.com\/..\/..\/withings-move$/.test(getPageUrl)){
+    if(/^https:\/\/www\.withings\.com\/..\/..\/(withings-move|withings-move\/store)$/.test(getPageUrl)){
       let descriptionMove;
 
       lastSeenProduct = data.subtypes[0];
@@ -193,7 +210,7 @@ module.exports = function triggers (options, cb) {
       dropCookie("hasBeenClicked", "true");
       dropCookie("sessionWhenClicked", `${numberOfSession}`);
       
-      options.emitCustomGoal('t103:haveSeenAProduct');
+      options.emitCustomGoal('t103:hasSeenAProduct');
     }
   }).replay()
 
@@ -214,7 +231,7 @@ module.exports = function triggers (options, cb) {
     dropCookie("hasBeenClicked", "true");
     dropCookie("sessionWhenClicked", `${numberOfSession}`);
     
-    options.emitCustomGoal('t103:haveSeenAProduct');
+    options.emitCustomGoal('t103:hasSeenAProduct');
 
   }).replay()
 
