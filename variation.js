@@ -11,6 +11,53 @@ module.exports = function variation (options) {
     sessionNumberCookie=state.sessionNumber;
   })
   
+  //add the corresponding product class to the card
+  function addProductClass(lastSeenCard){
+    switch(options.state.get('lastSeenProduct')){
+      
+      case "BPM": lastSeenCard.addClass("lsp_bpm")
+        break;
+        
+      case "Sleep": lastSeenCard.addClass("lsp_sleep")
+        break;
+        
+      case "Thermo": lastSeenCard.addClass("lsp_thermo")
+        break;
+        
+      case "Body+": lastSeenCard.addClass("lsp_bodyplus")
+        break;
+        
+      case "Body Cardio": lastSeenCard.addClass("lsp_bodycardio")
+        break;
+        
+      case "Body": lastSeenCard.addClass("lsp_body")
+        break;
+        
+      case "Steel": lastSeenCard.addClass("lsp_steel")
+        break;
+        
+      case "Steel HR": lastSeenCard.addClass("lsp_steelhr")
+        break;
+        
+      case "Steel HR Sport": lastSeenCard.addClass("lsp_steelhrsport")
+        break;
+        
+      case "Pulse HR": lastSeenCard.addClass("lsp_pulsehr")
+        break;
+        
+      case "Move": lastSeenCard.addClass("lsp_move")
+        break;
+        
+      case "Steel HR Sapphire": lastSeenCard.addClass("lsp_sapphire")
+        break;
+        
+      case "Steel HR Limited Edition": lastSeenCard.addClass("lsp_hrlimited")
+        break;
+        
+      default: break;
+    }
+  }
+  
   //if sessionNumberCookie has been set, it means the cross has been clicked, force set display at false
   //it is a new session for the user, we clear the cookie about the cross clicked so the cookie doesn't exist anymore and at the followin gcookie check, display can become true again
   if(sessionNumberCookie == cm.val(sessionWhenClicked)){
@@ -37,6 +84,7 @@ module.exports = function variation (options) {
   if(display == true){
     //select the elements
     lastSeenCard = $("#lastSeenProduct_withings")
+    addProductClass(lastSeenCard);
     lastSeenProductName = $("#lastSeenProduct_withings .card .product_name")
     lastSeenProductDescr = $("#lastSeenProduct_withings .card .product_desc")
     lastSeenProductImage = $("#lastSeenProduct_withings .card img")

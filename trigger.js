@@ -21,7 +21,7 @@ module.exports = function triggers (options, cb) {
   const steelshrsport = /^Steel HR Sport 40mm White$/
   const move =/^(withings-move|Withings Move Basic Essentials Black & Yellow Gold)$/
   const sapphire = /^Steel HR 36mm Sapphire Signature White & Rose Gold$/
-  const limmited = /^Steel HR 36mm Blue & Rose Gold$/
+  const limited = /^Steel HR 36mm Blue & Rose Gold$/
   const targetLanguage = /^(en)$/i
   let weightUnit = "kg"
   let numberOfSession;
@@ -73,7 +73,7 @@ module.exports = function triggers (options, cb) {
         
           case bpm.test(cm.val(cookie[0].name)): 
             options.state.set('lastSeenProduct', "BPM");
-            options.state.set('picture', "https://image-cache.withings.com/site/media/wi_products/blood-pressure-monitor.png?fit&src=png&h=300")
+            options.state.set('picture', "https://image-cache.withings.com/site/media/wi_products/bpm-3d-angle.png?fit&src=png&h=300")
             options.state.set("descr", cm.val(`${options.meta.visitorId}description`) )
             options.state.set("link", "/blood-pressure-monitor")
           return true;
@@ -115,28 +115,28 @@ module.exports = function triggers (options, cb) {
           
           case steel.test(cm.val(cookie[0].name)): 
             options.state.set('lastSeenProduct', "Steel")
-            options.state.set('picture', "https://image-cache.withings.com/site/media/wi_products/steel-white.png?fit&src=png&h=300")
+            options.state.set('picture', "https://image-cache.withings.com/site/media/wi_products/steel-silver-3d-face.png?fit&src=png&h=300")
             options.state.set("descr", cm.val(`${options.meta.visitorId}description`) )
             options.state.set("link", "/steel")
           return true;
           
           case steelhr.test(cm.val(cookie[0].name)): 
             options.state.set('lastSeenProduct', "Steel HR")
-            options.state.set('picture', "https://image-cache.withings.com/site/media/wi_products/steel-hr-36b.png?fit&src=png&h=300&dpr=2")
+            options.state.set('picture', "https://image-cache.withings.com/site/media/wi_products/steel-hr-36w-3d-angle.png?fit&src=png&h=300&dpr=2")
             options.state.set("descr", cm.val(`${options.meta.visitorId}description`) )
             options.state.set("link", "/steel-hr")
           return true;
           
           case steelshrsport.test(cm.val(cookie[0].name)): 
             options.state.set('lastSeenProduct', "Steel HR Sport")
-            options.state.set('picture', "https://image-cache.withings.com/site/media/wi_products/steel-hr-sport-40b.png?fit&src=png&h=300&dpr=2")
+            options.state.set('picture', "https://image-cache.withings.com/site/media/wi_products/steel-hr-sport-black-3d-angle.png?fit&src=png&h=300&dpr=2")
             options.state.set("descr", cm.val(`${options.meta.visitorId}description`) )
             options.state.set("link", "/steel-hr-sport")
           return true;
           
           case pulsehr.test(cm.val(cookie[0].name)): 
             options.state.set('lastSeenProduct', "Pulse HR")
-            options.state.set('picture', "https://image-cache.withings.com/site/media/wi_products/pulse-hr-black.png?fit&src=png&h=300")
+            options.state.set('picture', "https://image-cache.withings.com/site/media/wi_products/pulse-hr-3d-angle.png?fit&src=png&h=300")
             options.state.set("descr", cm.val(`${options.meta.visitorId}description`) )
             options.state.set("link", "/pulse-hr")
           return true;
@@ -184,7 +184,7 @@ module.exports = function triggers (options, cb) {
     if(/^https:\/\/www\.withings\.com\/..\/..\/(withings-move|withings-move\/store)$/.test(getPageUrl)){
       let descriptionMove;
 
-      lastSeenProduct = data.subtypes[0];
+      lastSeenProduct = "withings-move";
 
       getUserSession();
 
